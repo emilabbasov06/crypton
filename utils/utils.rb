@@ -7,4 +7,11 @@ module CryptonUtils
       )
     end
   end
+
+  class Data
+    def self.extract_symbol(message)
+      _, symbol = message.text.split(" ")
+      return symbol.upcase
+    end
+  end
 end

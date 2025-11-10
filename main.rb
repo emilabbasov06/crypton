@@ -57,8 +57,7 @@ class Bot
   end
 
   private def price(message)
-    _, symbol = message.text.split(" ")
-    symbol.upcase!
+    symbol = CryptonUtils::Data.extract_symbol(message)
 
     data = @api.get_data(symbol)["symbols"].first
     <<~MSG
@@ -73,8 +72,7 @@ class Bot
   end
 
   private def watch(user, message)
-    _, symbol = message.text.split(" ")
-    symbol.upcase!
+    symbol = CryptonUtils::Data.extract_symbol(message)
     coin = Watchlist.find_or_create_by(user: user, symbol: symbol)
     
     if coin.persisted?
@@ -85,8 +83,7 @@ class Bot
   end
 
   private def unwatch(user, message)
-    _, symbol = message.text.split(" ")
-    symbol.upcase!
+    symbol = CryptonUtils::Data.extract_symbol(message)
     coin = Watchlist.find_by(user: user, symbol: symbol)
     coin.destroy if coin
 
