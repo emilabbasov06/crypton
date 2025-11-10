@@ -5,10 +5,13 @@ require_relative "./models/user"
 require_relative "./models/watchlist"
 require_relative "./utils/utils"
 require_relative "./utils/email"
+require_relative "./api/api"
 
 
 class Bot
   def initialize
+    @api = CryptonAPI.new
+
     Telegram::Bot::Client.run(ENV["BOT_TOKEN"]) do |bot|
       bot.listen do |message|
         begin
@@ -31,6 +34,8 @@ class Bot
             CryptonUtils::Response.send(bot, message.chat.id, watch(user, message))
           when /^\/unwatch\b/
             CryptonUtils::Response.send(bot, message.chat.id, unwatch(user, message))
+          when /^\/price\b/
+            CryptonUtils::Response.send(bot, message.chat.id, price(message))
           else
             CryptonUtils::Response.send(bot, message.chat.id, "Help response.")
           end
@@ -49,6 +54,22 @@ class Bot
     else
       "👀 Your watchlist:\n" + items.join(", ")
     end
+  end
+
+  private def price(message)
+    _, symbol = message.text.split(" ")
+    symbol.upcase!
+
+    data = @api.get_data(symbol)["symbols"].first
+    <<~MSG
+📊 *#{symbol} Price Update*  
+💰 Price: $#{data["last"]}
+📉 Lowest: $#{data["lowest"]}
+📈 Highest: $#{data["highest"]}
+📆 Date: #{data["date"]}
+🌍 Exchange: #{data["source_exchange"]}
+🔁 24hr Change: #{data["daily_change_percentage"].to_f.round(6)}%
+    MSG
   end
 
   private def watch(user, message)

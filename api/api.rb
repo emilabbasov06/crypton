@@ -18,7 +18,7 @@ class CryptonAPI
     response = @conn.get("getData", { symbol: symbol })
 
     if response.success?
-      data = JSON.pretty_generate(JSON.parse(response.body))
+      data = JSON.parse(response.body)
       return data
     else
       puts "[ERROR]: There was problem about fetching the data..."
