@@ -4,7 +4,6 @@ require_relative "./db/setup"
 require_relative "./models/user"
 require_relative "./models/watchlist"
 require_relative "./utils/utils"
-require_relative "./utils/email"
 require_relative "./api/api"
 
 
