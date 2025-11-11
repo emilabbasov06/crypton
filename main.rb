@@ -6,13 +6,21 @@ require_relative "./models/watchlist"
 require_relative "./models/alert"
 require_relative "./utils/utils"
 require_relative "./api/api"
+require_relative "./helpers/alert"
 
 
 class Bot
   def initialize
     @api = CryptonAPI.new
+    @alert_checker = AlertChecker.new(nil)
 
     Telegram::Bot::Client.run(ENV["BOT_TOKEN"]) do |bot|
+      @alert_checker = AlertChecker.new(bot)
+
+      User.all.each do |user|
+        @alert_checker.start_for_user(user)
+      end
+
       bot.listen do |message|
         begin
           user = User.find_or_create_by(telegram_id: message.from.id) do |user|
@@ -38,6 +46,7 @@ class Bot
             CryptonUtils::Response.send(bot, message.chat.id, unwatch(user, message))
           when /^\/alert\b/
             CryptonUtils::Response.send(bot, message.chat.id, alert(user, message))
+            @alert_checker.start_for_user(user)
           when /^\/unalert\b/
             CryptonUtils::Response.send(bot, message.chat.id, unalert(user, message))
           when /^\/price\b/
