@@ -23,4 +23,15 @@ class CryptonAPI
       puts "[ERROR]: There was problem about fetching the data..."
     end
   end
+
+  def get_conversion(from, to, amount)
+    response = @conn.get("getConversion", {from: from.upcase, to: to.upcase, amount: amount})
+
+    if response.success?
+      data = JSON.parse(response.body)
+      return data
+    else
+      puts "[ERROR]: There was a problem about fetching the data..."
+    end
+  end
 end

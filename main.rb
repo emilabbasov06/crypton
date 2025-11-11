@@ -35,6 +35,8 @@ class Bot
             CryptonUtils::Response.send(bot, message.chat.id, unwatch(user, message))
           when /^\/price\b/
             CryptonUtils::Response.send(bot, message.chat.id, price(message))
+          when /^\/convert\b/
+            CryptonUtils::Response.send(bot, message.chat.id, convert(message))
           else
             CryptonUtils::Response.send(bot, message.chat.id, "Help response.")
           end
@@ -55,18 +57,29 @@ class Bot
     end
   end
 
+  private def convert(message)
+    from, to, amount = CryptonUtils::Data.extract_multiple_params(message, 3)
+
+    data = @api.get_conversion(from, to, amount)
+    <<~MSG
+      💱 Conversion Result
+
+      #{amount} #{from.upcase} = #{data["result"].to_f.round(4)} #{to.upcase}
+    MSG
+  end
+
   private def price(message)
     symbol = CryptonUtils::Data.extract_symbol(message)
 
     data = @api.get_data(symbol)["symbols"].first
     <<~MSG
-📊 *#{symbol} Price Update*  
-💰 Price: $#{data["last"]}
-📉 Lowest: $#{data["lowest"]}
-📈 Highest: $#{data["highest"]}
-📆 Date: #{data["date"]}
-🌍 Exchange: #{data["source_exchange"]}
-🔁 24hr Change: #{data["daily_change_percentage"].to_f.round(6)}%
+      📊 *#{symbol} Price Update*  
+      💰 Price: $#{data["last"]}
+      📉 Lowest: $#{data["lowest"]}
+      📈 Highest: $#{data["highest"]}
+      📆 Date: #{data["date"]}
+      🌍 Exchange: #{data["source_exchange"]}
+      🔁 24hr Change: #{data["daily_change_percentage"].to_f.round(6)}%
     MSG
   end
 

@@ -13,5 +13,10 @@ module CryptonUtils
       _, symbol = message.text.split(" ")
       return symbol.upcase
     end
+
+    def self.extract_multiple_params(message, count)
+      result = message.text.split(" ")[1, count]
+      return result
+    end
   end
 end
