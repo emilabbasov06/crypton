@@ -3,6 +3,7 @@ require "dotenv/load"
 require_relative "./db/setup"
 require_relative "./models/user"
 require_relative "./models/watchlist"
+require_relative "./models/alert"
 require_relative "./utils/utils"
 require_relative "./api/api"
 
@@ -29,6 +30,8 @@ class Bot
             CryptonUtils::Response.send(bot, message.chat.id, "Pong!")
           when "/list"
             CryptonUtils::Response.send(bot, message.chat.id, list(user))
+          when "/alerts"
+            CryptonUtils::Response.send(bot, message.chat.id, alerts(user))
           when /^\/watch\b/
             CryptonUtils::Response.send(bot, message.chat.id, watch(user, message))
           when /^\/unwatch\b/
@@ -54,6 +57,15 @@ class Bot
       "📭 Your watchlist is empty."
     else
       "👀 Your watchlist:\n" + items.join(", ")
+    end
+  end
+
+  private def alerts(user)
+    items = user.alerts.pluck(:symbol)
+    if items.empty?
+      "📭 Your alert list is empty."
+    else
+      "👀 Your alerts:\n" + items.join(", ")
     end
   end
 
