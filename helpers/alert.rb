@@ -25,7 +25,7 @@ class AlertChecker
         break if alerts.empty?
 
         alerts.each do |alert|
-          current_price = @api.get_data(alert.symbol)["symbols"].first["last"]
+          current_price = @api.get_data(alert.symbol)["symbols"].first["last"].to_f
           next unless current_price
 
           if triggered?(alert, current_price)
@@ -42,9 +42,9 @@ class AlertChecker
   private def triggered?(alert, current_price)
     case alert.direction
     when "above"
-      current_price.to_f >= alert.target_price.to_f
+      current_price >= alert.target_price.to_f
     when "below"
-      current_price.to_f <= alert.target_price.to_f
+      current_price <= alert.target_price.to_f
     end
   end
 end
