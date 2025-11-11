@@ -30,3 +30,17 @@ unless ActiveRecord::Base.connection.table_exists?(:watchlists)
     add_foreign_key :watchlists, :users, column: :user_telegram_id, primary_key: :telegram_id
   end
 end
+
+unless ActiveRecord::Base.connection.table_exists?(:alerts)
+  ActiveRecord::Schema.define do
+    create_table :alerts do |table|
+      table.integer :user_telegram_id, null: false
+      table.string :symbol, null: false
+      table.decimal :target_price, precision: 15, scale: 8, null: false
+      table.string :direction, null: false
+      table.boolean :triggered, default: false
+
+      table.timestamps
+    end
+  end
+end
