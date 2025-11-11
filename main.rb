@@ -5,6 +5,7 @@ require_relative "./models/user"
 require_relative "./models/watchlist"
 require_relative "./models/alert"
 require_relative "./utils/utils"
+require_relative "./utils/messages"
 require_relative "./api/api"
 require_relative "./helpers/alert"
 
@@ -31,9 +32,9 @@ class Bot
 
           case message.text
           when "/start"
-            CryptonUtils::Response.send(bot, message.chat.id, "Hi, #{user.first_name} [@#{user.username}]")
+            CryptonUtils::Response.send(bot, message.chat.id, CryptonMessages::START)
           when "/help"
-            CryptonUtils::Response.send(bot, message.chat.id, "Help response.")
+            CryptonUtils::Response.send(bot, message.chat.id, CryptonMessages::HELP)
           when "/ping"
             CryptonUtils::Response.send(bot, message.chat.id, "Pong!")
           when "/list"
@@ -54,7 +55,7 @@ class Bot
           when /^\/convert\b/
             CryptonUtils::Response.send(bot, message.chat.id, convert(message))
           else
-            CryptonUtils::Response.send(bot, message.chat.id, "Help response.")
+            CryptonUtils::Response.send(bot, message.chat.id, CryptonMessages::HELP)
           end
         rescue => e
           puts "[ERROR]: #{e.message}"
