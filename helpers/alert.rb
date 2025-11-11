@@ -2,7 +2,6 @@ require_relative "../api/api"
 require_relative "../models/user"
 require_relative "../models/alert"
 require_relative "./http"
-require "json"
 
 
 class AlertChecker
