@@ -36,6 +36,10 @@ class Bot
             CryptonUtils::Response.send(bot, message.chat.id, watch(user, message))
           when /^\/unwatch\b/
             CryptonUtils::Response.send(bot, message.chat.id, unwatch(user, message))
+          when /^\/alert\b/
+            CryptonUtils::Response.send(bot, message.chat.id, alert(user, message))
+          when /^\/unalert\b/
+            CryptonUtils::Response.send(bot, message.chat.id, unalert(user, message))
           when /^\/price\b/
             CryptonUtils::Response.send(bot, message.chat.id, price(message))
           when /^\/convert\b/
@@ -112,6 +116,32 @@ class Bot
     coin.destroy if coin
 
     "❌ Removed #{symbol} from your watchlist!"
+  end
+
+  private def alert(user, message)
+    symbol, target_price, direction = CryptonUtils::Data.extract_multiple_params(message, 3)
+
+    alert = Alert.find_or_create_by(
+      user: user, 
+      symbol: symbol,
+      target_price: target_price,
+      direction: direction
+    )
+
+    if alert.persisted?
+      "✅ Added #{symbol} to your alert list."
+    else
+      "⚠️ Could not add #{symbol} to your alert list."
+    end
+  end
+
+  private def unalert(user, message)
+    symbol, target_price, direction = CryptonUtils::Data.extract_multiple_params(message, 3)
+
+    alert = Alert.find_by(user: user, symbol: symbol, target_price: target_price, direction: direction)
+    alert.destroy if alert
+
+    "❌ Removed #{symbol} from your alert list"
   end
 
 end
