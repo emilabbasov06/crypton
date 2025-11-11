@@ -1,13 +1,12 @@
-require "faraday"
 require "json"
 require "dotenv/load"
+require_relative "../helpers/http"
 
 
 class CryptonAPI
   def initialize
-    @conn = Faraday.new(
-      url: ENV["API_URL"],
-      headers: {
+    @conn = Http.new(ENV["API_URL"]).get_conn_with_headers(
+      {
         "Content-Type" => "application/json",
         "Authorization" => "Bearer #{ENV["API_KEY"]}"
       }

@@ -2,6 +2,8 @@ require "faraday"
 
 
 class Http
+  attr_reader :url
+
   def initialize(url)
     @url = url
   end
