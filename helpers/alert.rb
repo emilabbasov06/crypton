@@ -22,7 +22,12 @@ class AlertChecker
     @running_threads[user.telegram_id] = Thread.new do
       loop do
         alerts = Alert.where(user_telegram_id: user.telegram_id, triggered: false)
-        break if alerts.empty?
+
+        if alerts.empty?
+          @running_threads.delete(user.telegram_id)
+          puts "[INFO]: Stopping alert for <User ##{user.telegram_id}>"
+          break
+        end
 
         alerts.each do |alert|
           current_price = @api.get_data(alert.symbol)["symbols"].first["last"].to_f
@@ -30,7 +35,18 @@ class AlertChecker
 
           if triggered?(alert, current_price)
             alert.update(triggered: true)
-            puts "Alert got triggered"
+            message = <<~MSG
+              🚨 *Alert Triggered!*
+
+              🔹 Symbol: #{alert.symbol}
+              🔹 Direction: #{alert.direction.upcase}
+              🔹 Target Price: $#{alert.target_price}
+              🔹 Current Price: $#{current_price}
+
+              ⚡ Take action now!
+            MSG
+            CryptonUtils::Response.send(@bot, user.telegram_id, message)
+
             alert.destroy
           end
         end
